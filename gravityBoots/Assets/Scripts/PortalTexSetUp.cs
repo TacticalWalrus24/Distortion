@@ -26,37 +26,48 @@ public class PortalTexSetUp : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (camA.targetTexture != null)
+        if (camA != null)
         {
-            camA.targetTexture.Release();
+            if (camA.targetTexture != null)
+            {
+                camA.targetTexture.Release();
+            }
+
+            camA.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
+            camA_Mat.mainTexture = camA.targetTexture;
         }
 
-        camA.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        camA_Mat.mainTexture = camA.targetTexture;
-
-        if (camB.targetTexture != null)
+        if (camB != null)
         {
-            camB.targetTexture.Release();
+            if (camB.targetTexture != null)
+            {
+                camB.targetTexture.Release();
+            }
+
+            camB.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
+            camB_Mat.mainTexture = camB.targetTexture;
         }
 
-        camB.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        camB_Mat.mainTexture = camB.targetTexture;
-
-
-        if (camC.targetTexture != null)
+        if (camC != null)
         {
-            camC.targetTexture.Release();
+            if (camC.targetTexture != null)
+            {
+                camC.targetTexture.Release();
+            }
+
+            camC.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
+            camC_Mat.mainTexture = camC.targetTexture;
         }
 
-        camC.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        camC_Mat.mainTexture = camC.targetTexture;
-
-        if (camD.targetTexture != null)
+        if (camD != null)
         {
-            camD.targetTexture.Release();
-        }
+            if (camD.targetTexture != null)
+            {
+                camD.targetTexture.Release();
+            }
 
-        camD.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        camD_Mat.mainTexture = camD.targetTexture;
+            camD.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
+            camD_Mat.mainTexture = camD.targetTexture;
+        }
     }
 }

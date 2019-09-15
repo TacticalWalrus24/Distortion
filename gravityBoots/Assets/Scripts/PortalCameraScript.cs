@@ -17,9 +17,9 @@ public class PortalCameraScript : MonoBehaviour
         Vector3 playerOffset = playerCam.position - otherPortal.position;
         transform.position = portal.position + playerOffset;
 
-        float angleDiff = Quaternion.Angle(portal.rotation, otherPortal.rotation);
+        float angleDiff = Quaternion.Angle(portal.rotation, otherPortal.rotation) - 180;
 
-        Quaternion portalRotDiff = Quaternion.AngleAxis(angleDiff, Vector3.up);
+        Quaternion portalRotDiff = Quaternion.AngleAxis(angleDiff, otherPortal.up);
         Vector3 newCamDir = portalRotDiff * playerCam.forward;
         transform.rotation = Quaternion.LookRotation(newCamDir, playerCam.up);
     }

@@ -17,7 +17,6 @@ public class TeleporterScript : MonoBehaviour
         {
             Vector3 portalToPlayer = teleObject.position - transform.position;
             float dotProduct = Vector3.Dot(transform.up, portalToPlayer);
-            Debug.Log(dotProduct);
             if (dotProduct < 0)
             {
                 float rotDiff = -Quaternion.Angle(transform.rotation, exit.rotation);

@@ -1,0 +1,2 @@
+C:\Users\Vaughan Bunt\Documents\School\year 2\game dev\Distortion\gravityBoots\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+C:\Users\Vaughan Bunt\Documents\School\year 2\game dev\Distortion\gravityBoots\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
