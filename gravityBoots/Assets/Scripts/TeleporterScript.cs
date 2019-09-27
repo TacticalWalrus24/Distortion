@@ -9,6 +9,8 @@ public class TeleporterScript : MonoBehaviour
     [SerializeField]
     Transform exit;
 
+    public Transform cam;
+
     private bool isOverlapping = false;
     // Update is called once per frame
     void Update()
@@ -25,6 +27,9 @@ public class TeleporterScript : MonoBehaviour
 
                 Vector3 posOffset = Quaternion.Euler(0, rotDiff, 0) * portalToPlayer;
                 teleObject.position = exit.position + posOffset;
+
+                exit.GetComponent<TeleporterScript>().cam.gameObject.active = true;
+                cam.gameObject.active = false;
 
                 isOverlapping = false;
             }

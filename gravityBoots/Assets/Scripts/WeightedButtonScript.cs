@@ -6,10 +6,13 @@ public class WeightedButtonScript : MonoBehaviour
 {
     [SerializeField]
     float weightLimit = 1;
+    [SerializeField]
+    Transform door;
 
     float impulseTrigger;
     bool activated = false;
     bool canChange = true;
+    public bool triggered = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,37 +21,43 @@ public class WeightedButtonScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (weightLimit <= impulseTrigger)
+        if (activated && canChange)
         {
-            if (!activated && canChange)
-            {
-                StartCoroutine("Activate");
-            }
-
+            StartCoroutine("Activate");
         }
-        else if (activated && canChange)
+        else if (canChange)
         {
             StartCoroutine("Deactivate");
         }
+
+        if (triggered)
+        {
+            door.GetComponent<DoorOpenScript>().OpenDoor();
+        }
+        else
+        {
+            door.GetComponent<DoorOpenScript>().CloseDoor();
+        }
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
-        impulseTrigger = collision.impulse.y;
-        if (impulseTrigger < 0)
+        if (collision.transform.CompareTag("PickUp"))
         {
-            impulseTrigger *= -1;
+            activated = true;
         }
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        impulseTrigger = 0;
+        if (collision.transform.CompareTag("PickUp"))
+        {
+            activated = false;
+        }
     }
 
     IEnumerator Activate()
     {
-        activated = true;
         canChange = false;
         while (transform.localPosition.y > -0.01)
         {
@@ -61,6 +70,7 @@ public class WeightedButtonScript : MonoBehaviour
         Debug.Log(impulseTrigger);
 
         canChange = true;
+        triggered = true;
     }
 
     IEnumerator Deactivate()
@@ -76,6 +86,7 @@ public class WeightedButtonScript : MonoBehaviour
         Debug.Log("untrigger");
         Debug.Log(impulseTrigger);
         canChange = true;
+        triggered = false;
     }
 
 }

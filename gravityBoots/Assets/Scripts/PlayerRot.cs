@@ -17,8 +17,6 @@ public class PlayerRot : MonoBehaviour
     [SerializeField]
     private float moveSpeed = 6; // move speed
     [SerializeField]
-    private float runSpeed = 10;
-    [SerializeField]
     private bool isWalking = true;
     [SerializeField]
     private GameObject cam; // camera
@@ -97,10 +95,11 @@ public class PlayerRot : MonoBehaviour
                 //PlayJumpSound();
                 JumpToWall(hit.point, hit.normal); // yes: jump to the wall
             }
-            else if (isGrounded)
+            else if (isGrounded && !airborne)
             { // no: if grounded, jump up
                 //PlayJumpSound();
                 GetComponent<Rigidbody>().velocity += jumpSpeed * myNormal;
+                airborne = true;
             }
         }
         if (Input.GetKeyDown(KeyCode.X))
@@ -145,22 +144,13 @@ public class PlayerRot : MonoBehaviour
         myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRot, lerpSpeed * Time.deltaTime);
         float speed;
 
-        if (isWalking)
-        {
-            // move the character forth/back with Vertical axis:
-            myTransform.Translate(0, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
-            // move the character left/right with Horizontal axis:
-            myTransform.Translate(Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, 0);
-            speed = moveSpeed;
-        }
-        else
-        {
-            // move the character forth/back with Vertical axis:
-            myTransform.Translate(0, 0, Input.GetAxis("Vertical") * runSpeed * Time.deltaTime);
-            // move the character left/right with Horizontal axis:
-            myTransform.Translate(Input.GetAxis("Horizontal") * runSpeed * Time.deltaTime, 0, 0);
-            speed = runSpeed;
-        }
+
+        // move the character forth/back with Vertical axis:
+        myTransform.Translate(0, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+        // move the character left/right with Horizontal axis:
+        myTransform.Translate(Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, 0);
+        speed = moveSpeed;
+
         //ProgressStepCycle(speed);
     }
 
