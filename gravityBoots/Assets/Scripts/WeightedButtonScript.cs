@@ -6,8 +6,6 @@ public class WeightedButtonScript : MonoBehaviour
 {
     [SerializeField]
     float weightLimit = 1;
-    [SerializeField]
-    Transform door;
 
     float impulseTrigger;
     bool activated = false;
@@ -28,15 +26,6 @@ public class WeightedButtonScript : MonoBehaviour
         else if (canChange)
         {
             StartCoroutine("Deactivate");
-        }
-
-        if (triggered)
-        {
-            door.GetComponent<DoorOpenScript>().OpenDoor();
-        }
-        else
-        {
-            door.GetComponent<DoorOpenScript>().CloseDoor();
         }
     }
 
