@@ -7,7 +7,7 @@ public class DoorOpenScript : MonoBehaviour
     [SerializeField]
     float openDist = 2;
     [SerializeField]
-    float speed = 10;
+    Vector3 speed;
     [SerializeField]
     Transform button;
 
@@ -33,8 +33,10 @@ public class DoorOpenScript : MonoBehaviour
     {
         while (openDist > movedDist)
         {
-            transform.Translate(speed * Time.deltaTime, 0, 0);
-            movedDist += speed * Time.deltaTime;
+            transform.Translate(speed * Time.deltaTime);
+            movedDist += speed.x * Time.deltaTime;
+            movedDist += speed.y * Time.deltaTime;
+            movedDist += speed.z * Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
         open = true;
@@ -44,8 +46,10 @@ public class DoorOpenScript : MonoBehaviour
     {
         while (movedDist > 0)
         {
-            transform.Translate(-speed * Time.deltaTime, 0, 0);
-            movedDist -= speed * Time.deltaTime;
+            transform.Translate(-speed * Time.deltaTime);
+            movedDist -= speed.x * Time.deltaTime;
+            movedDist -= speed.y * Time.deltaTime;
+            movedDist -= speed.z * Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
         open = false;
