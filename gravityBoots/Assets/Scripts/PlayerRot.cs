@@ -35,6 +35,7 @@ public class PlayerRot : MonoBehaviour
     private Vector3 myNormal; // character normal
     private float distGround; // distance from character position to ground
     private bool jumping = false; // flag &quot;I'm jumping to wall&quot;
+    private bool isJumping = false;
     private float vertSpeed = 0; // vertical jump current speed
     bool airborne = false;
 
@@ -87,7 +88,7 @@ public class PlayerRot : MonoBehaviour
         Ray ray;
         RaycastHit hit;
 
-        if (Input.GetButtonDown("Jump"))
+        if (isJumping)
         { // jump pressed:
             ray = new Ray(cam.transform.position, cam.transform.forward);
             if (Physics.Raycast(ray, out hit, jumpRange, 1 << 9) && bootsOn)
@@ -98,7 +99,7 @@ public class PlayerRot : MonoBehaviour
             else if (isGrounded && !airborne)
             { // no: if grounded, jump up
                 //PlayJumpSound();
-                GetComponent<Rigidbody>().velocity += jumpSpeed * myNormal;
+                GetComponent<Rigidbody>().AddForce(jumpSpeed * myNormal);
                 airborne = true;
             }
         }
@@ -157,6 +158,7 @@ public class PlayerRot : MonoBehaviour
     private void LateUpdate()
     {
         isWalking = !Input.GetKey(KeyCode.LeftShift);
+        isJumping = Input.GetButton("Jump");
     }
 
     private void JumpToWall(Vector3 point, Vector3 normal)

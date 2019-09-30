@@ -19,7 +19,7 @@ public class PickUpScript : MonoBehaviour
     Transform objectHeld;
     Transform portalObject;
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         Ray ray;
         RaycastHit hit;
