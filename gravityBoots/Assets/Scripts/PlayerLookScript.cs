@@ -8,23 +8,15 @@ public class PlayerLookScript : MonoBehaviour
     private GameObject cam; // camera
     [SerializeField]
     private float turnSpeed = 90; // turning speed (degrees/second)
-    [SerializeField]
-    private bool lockCursor = true;
+    public bool lockCursor = true;
     [SerializeField]
     private float maxUp = 180;
     [SerializeField]
     private float maxDown = 0;
-
-    Transform cameraTransform;
     float pitch = 0;
-    // Start is called before the first frame update
-    void Start()
-    {
-        cameraTransform = Camera.main.transform;
-    }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         Transform temp = cam.transform;
         transform.Rotate(0, Input.GetAxis("Mouse X") * turnSpeed * Time.deltaTime, 0);
@@ -38,15 +30,6 @@ public class PlayerLookScript : MonoBehaviour
 
     private void InternalLockUpdate()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            lockCursor = false;
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            lockCursor = true;
-        }
-
         if (lockCursor)
         {
             Cursor.lockState = CursorLockMode.Locked;

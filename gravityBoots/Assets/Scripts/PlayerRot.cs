@@ -26,7 +26,7 @@ public class PlayerRot : MonoBehaviour
     private float gravity = 10; // gravity acceleration
     [SerializeField]
     private bool isGrounded;
-    private float deltaGround = 0.2f; // character is grounded up to this distance
+    private float deltaGround = 0.05f; // character is grounded up to this distance
     [SerializeField]
     private float jumpSpeed = 10; // vertical jump initial speed
     [SerializeField]
@@ -39,23 +39,25 @@ public class PlayerRot : MonoBehaviour
     private float vertSpeed = 0; // vertical jump current speed
     bool airborne = false;
 
-    //[SerializeField]
-    //private AudioClip[] footstepSounds;    // an array of footstep sounds that will be randomly selected from.
-    //[SerializeField]
-    //private AudioClip jumpSound;           // the sound played when character leaves the ground.
-    //[SerializeField]
-    //private AudioClip landSound;           // the sound played when character touches back on ground.
-    //[SerializeField]
-    //[Range(0f, 1f)] private float runstepLenghten;
-    //[SerializeField]
-    //private float m_StepInterval;
-    //private float stepCycle;
-    //private float nextStep;
+    [SerializeField]
+    private AudioClip[] footstepSounds;    // an array of footstep sounds that will be randomly selected from.
+    [SerializeField]
+    private AudioClip jumpSound;           // the sound played when character leaves the ground.
+    [SerializeField]
+    private AudioClip landSound;           // the sound played when character touches back on ground.
+    [SerializeField]
+    [Range(0f, 1f)] private float runstepLenghten;
+    [SerializeField]
+    private float m_StepInterval;
+    private float stepCycle;
+    private float nextStep;
 
     private Transform myTransform;
     private BoxCollider boxCollider; // drag BoxCollider ref in editor
     public bool bootsOn = true;
-    //private AudioSource m_AudioSource;
+    private AudioSource m_AudioSource;
+    private bool soundPlayed = false;
+    private bool trueGround = false;
 
     private void Start()
     {
@@ -67,18 +69,14 @@ public class PlayerRot : MonoBehaviour
         // distance from transform.position to ground
         distGround = boxCollider.size.y - boxCollider.center.y;
 
-        //stepCycle = 0f;
-        //nextStep = stepCycle / 2f;
-        //m_AudioSource = GetComponent<AudioSource>();
+        stepCycle = 0f;
+        nextStep = stepCycle / 2f;
+        m_AudioSource = GetComponent<AudioSource>();
 
     }
 
     private void FixedUpdate()
     {
-        if ((transform.eulerAngles.x > 1 || transform.eulerAngles.x < -1 || transform.eulerAngles.z > 1 || transform.eulerAngles.z < -1) && !bootsOn)
-        {
-            StartCoroutine("returnVertical");
-        }
         // apply constant weight force according to character normal:
         GetComponent<Rigidbody>().AddForce(-gravity * GetComponent<Rigidbody>().mass * myNormal);
 
@@ -93,22 +91,18 @@ public class PlayerRot : MonoBehaviour
             ray = new Ray(cam.transform.position, cam.transform.forward);
             if (Physics.Raycast(ray, out hit, jumpRange, 1 << 9) && bootsOn)
             { // wall ahead?
-                //PlayJumpSound();
+                PlayJumpSound();
                 JumpToWall(hit.point, hit.normal); // yes: jump to the wall
             }
             else if (isGrounded && !airborne)
             { // no: if grounded, jump up
-                //PlayJumpSound();
                 GetComponent<Rigidbody>().AddForce(jumpSpeed * myNormal);
                 airborne = true;
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            if (transform.eulerAngles.x > 1 || transform.eulerAngles.x < -1 || transform.eulerAngles.z > 1 || transform.eulerAngles.z < -1)
-            {
-                GetComponent<Rigidbody>().velocity += jumpSpeed * myNormal / 2;
-                StartCoroutine("returnVertical");
+                if (!soundPlayed)
+                {
+                    PlayJumpSound();
+                    soundPlayed = true;
+                }
             }
         }
         // update surface normal and isGrounded:
@@ -116,9 +110,11 @@ public class PlayerRot : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         { // use it to update myNormal and isGrounded
             isGrounded = hit.distance <= distGround + deltaGround;
+            trueGround = hit.distance <= distGround;
             if (isGrounded && airborne)
             {
-                //PlayLandingSound();
+                PlayLandingSound();
+                soundPlayed = false;
                 airborne = false;
             }
             else if (!isGrounded)
@@ -152,7 +148,7 @@ public class PlayerRot : MonoBehaviour
         myTransform.Translate(Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, 0);
         speed = moveSpeed;
 
-        //ProgressStepCycle(speed);
+        ProgressStepCycle(speed);
     }
 
     private void LateUpdate()
@@ -191,60 +187,51 @@ public class PlayerRot : MonoBehaviour
 
     }
 
-
-    IEnumerator returnVertical()
+    private void PlayLandingSound()
     {
-        yield return new WaitForSeconds(0.3f);
-
-        JumpToWall(transform.position, new Vector3(0, 0, 0));
+        m_AudioSource.clip = landSound;
+        m_AudioSource.Play();
+        nextStep = stepCycle + .5f;
     }
 
-    //private void PlayLandingSound()
-    //{
-    //    m_AudioSource.clip = landSound;
-    //    m_AudioSource.Play();
-    //    nextStep = stepCycle + .5f;
-    //}
+    private void PlayJumpSound()
+    {
+        m_AudioSource.clip = jumpSound;
+        m_AudioSource.Play();
+    }
 
-    //private void PlayJumpSound()
-    //{
-    //    m_AudioSource.clip = jumpSound;
-    //    m_AudioSource.Play();
-    //}
+    private void ProgressStepCycle(float speed)
+    {
+        if (transform.GetComponent<Rigidbody>().velocity.sqrMagnitude > 0 && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
+        {
+            stepCycle += (transform.GetComponent<Rigidbody>().velocity.sqrMagnitude + (speed * (isWalking ? 1f : runstepLenghten))) * Time.fixedDeltaTime;
+        }
 
-    //private void ProgressStepCycle(float speed)
-    //{
-    //    if (transform.GetComponent<Rigidbody>().velocity.sqrMagnitude > 0 && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
-    //    {
-    //        stepCycle += (transform.GetComponent<Rigidbody>().velocity.sqrMagnitude + (speed * (isWalking ? 1f : runstepLenghten))) *
-    //                     Time.fixedDeltaTime;
-    //    }
+        if (!(stepCycle > nextStep))
+        {
+            return;
+        }
 
-    //    if (!(stepCycle > nextStep))
-    //    {
-    //        return;
-    //    }
-
-    //    nextStep = stepCycle + m_StepInterval;
+        nextStep = stepCycle + m_StepInterval;
 
 
-    //    PlayFootStepAudio();
-    //}
+        PlayFootStepAudio();
+    }
 
 
-    //private void PlayFootStepAudio()
-    //{
-    //    if (isGrounded)
-    //    {
-    //        return;
-    //    }
-    //    // pick & play a random footstep sound from the array,
-    //    // excluding sound at index 0
-    //    int n = Random.Range(1, footstepSounds.Length);
-    //    m_AudioSource.clip = footstepSounds[n];
-    //    m_AudioSource.PlayOneShot(m_AudioSource.clip);
-    //    // move picked sound to index 0 so it's not picked next time
-    //    footstepSounds[n] = footstepSounds[0];
-    //    footstepSounds[0] = m_AudioSource.clip;
-    //}
+    private void PlayFootStepAudio()
+    {
+        if (!isGrounded)
+        {
+            return;
+        }
+        // pick & play a random footstep sound from the array,
+        // excluding sound at index 0
+        int n = Random.Range(1, footstepSounds.Length);
+        m_AudioSource.clip = footstepSounds[n];
+        m_AudioSource.PlayOneShot(m_AudioSource.clip);
+        // move picked sound to index 0 so it's not picked next time
+        footstepSounds[n] = footstepSounds[0];
+        footstepSounds[0] = m_AudioSource.clip;
+    }
 }
